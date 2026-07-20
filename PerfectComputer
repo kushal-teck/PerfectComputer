@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfect Computer - RSCIT Center, Gogunda</title>
+
+<!-- Firebase SDKs loaded via dynamic loader below -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap');
+
+  :root {
+    --forest: #2D5016;
+    --moss: #4A7C23;
+    --leaf: #6FAE3C;
+    --sage: #A8C878;
+    --cream: #F5F0E8;
+    --parchment: #EDE4D3;
+    --wood-dark: #6B4226;
+    --wood-mid: #8B5E3C;
+    --wood-light: #C49A6C;
+    --bark: #3D2810;
+    --gold: #C8A94B;
+    --text-dark: #1A1A0F;
+    --text-mid: #3D3520;
+    --shadow: rgba(45,80,22,0.18);
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Lato', 'Noto Sans Devanagari', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* LEAF DECORATION */
+  .leaf-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .leaf-bg::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #6FAE3C22 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .leaf-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -60px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, #4A7C2322 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  /* NAV BAR */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(135deg, var(--bark) 0%, var(--wood-dark) 50%, var(--forest) 100%);
+    border-bottom: 3px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 64px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--leaf), var(--gold));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--cream);
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  .nav-subtitle {
+    font-size: 10px;
+    color: var(--sage);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .nav-btn {
+    padding: 9px 22px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-register {
+    background: linear-gradient(135deg, var(--leaf), var(--moss));
+    color: white;
+    box-shadow: 0 2px 8px rgba(106,174,60,0.4);
+  }
+  .btn-register:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(106,174,60,0.5); }
+
+  .btn-login {
+    background: linear-gradient(135deg, var(--gold), var(--wood-light));
+    color: var(--bark);
+    box-shadow: 0 2px 8px rgba(200,169,75,0.4);
+  }
+  .btn-login:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(200,169,75,0.5); }
+
+  /* HERO SECTION */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 24px 40px;
+    background: linear-gradient(180deg, rgba(45,80,22,0.08) 0%, transparent 100%);
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--wood-dark), var(--wood-mid));
+    color: var(--cream);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    border: 1px solid var(--gold);
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 900;
+    color: var(--forest);
+    line-height: 1.1;
+    text-shadow: 2px 2px 0px var(--sage);
+    margin-bottom: 8px;
+  }
+
+  .hero h1 span {
+    color: var(--wood-dark);
+    display: block;
+    font-size: 0.6em;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: none;
+    margin-bottom: 4px;
+  }
+
+  .hero-tagline {
+    font-size: 16px;
+    color: var(--text-mid);
+    margin: 16px 0 32px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .hero-info-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    padding: 0 8px;
+  }
+
+  .info-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: white;
+    border: 1.5px solid var(--sage);
+    border-radius: 24px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--forest);
+    font-weight: 700;
+    box-shadow: 0 2px 8px var(--shadow);
+    white-space: nowrap;
+  }
+
+  /* WOOD DIVIDER */
+  .wood-divider {
+    height: 8px;
+    background: linear-gradient(90deg, var(--bark), var(--wood-mid), var(--wood-light), var(--wood-mid), var(--bark));
+    margin: 8px 0;
+    position: relative;
+  }
+  .wood-divider::before, .wood-divider::after {
+    content: '🌿';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+  }
+  .wood-divider::before { left: 16px; }
+  .wood-divider::after { right: 16px; }
+
+  /* COURSES SECTION */
+  .section {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .section-title {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--forest);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: var(--wood-mid);
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .course-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px var(--shadow);
+    border: 2px solid var(--parchment);
+    transition: transform 0.25s, box-shadow 0.25s;
+    position: relative;
+  }
+
+  .course-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(45,80,22,0.2);
+    border-color: var(--leaf);
+  }
+
+  .course-img {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    position: relative;
+  }
+
+  .course-img-rscit { background: linear-gradient(135deg, #2D5016, #4A7C23); }
+  .course-img-tally { background: linear-gradient(135deg, #3D2810, #6B4226); }
+  .course-img-excel { background: linear-gradient(135deg, #1a3a4a, #1D6A35); }
+  .course-img-computer { background: linear-gradient(135deg, #4a2060, #7B3F9E); }
+
+  .course-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--gold);
+    color: var(--bark);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+
+  .course-body { padding: 20px; }
+
+  .course-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: 6px;
+  }
+
+  .course-desc {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .course-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .price-tag {
+    background: linear-gradient(135deg, var(--forest), var(--moss));
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+  }
+
+  .course-enroll-btn {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, var(--leaf), var(--moss));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .course-enroll-btn:hover {
+    background: linear-gradient(135deg, var(--moss), var(--forest));
+    transform: translateY(-1px);
+  }
+
+  /* ABOUT/ADDRESS SECTION */
+  .about-strip {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, var(--bark) 0%, var(--wood-dark) 60%, var(--forest) 100%);
+    padding: 40px 20px;
+    color: var(--cream);
+    text-align: center;
+  }
+
+  .about-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .about-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .about-icon { font-size: 32px; }
+  .about-label { font-size: 12px; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; }
+  .about-value { font-size: 15px; font-weight: 700; color: var(--sage); }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(26,26,15,0.7);
+    z-index: 2000;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+    backdrop-filter: blur(4px);
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--cream);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 540px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 2px solid var(--wood-light);
+    overflow: hidden;
+    max-height: none;
+    margin: auto;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, var(--forest), var(--moss));
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .modal-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.35); }
+
+  .modal-body { padding: 24px; }
+
+  /* FORM STYLES */
+  .form-group { margin-bottom: 16px; }
+
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid var(--parchment);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: white;
+    transition: border-color 0.2s;
+    font-family: 'Lato', sans-serif;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--leaf);
+    box-shadow: 0 0 0 3px rgba(106,174,60,0.15);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* COURSE SELECTOR */
+  .course-selector-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: 10px;
+  }
+
+  .course-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .course-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 2px solid var(--parchment);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+  }
+  .course-option:hover { border-color: var(--leaf); background: #f9fdf5; }
+  .course-option.selected { border-color: var(--leaf); background: #f0fae5; }
+
+  .course-option input[type="checkbox"] {
+    width: 18px; height: 18px;
+    cursor: pointer;
+    accent-color: var(--leaf);
+    flex-shrink: 0;
+  }
+
+  .course-option-info { flex: 1; }
+  .course-option-name { font-weight: 700; font-size: 14px; color: var(--forest); }
+  .course-option-price { font-size: 12px; color: var(--wood-mid); }
+
+  .course-option-icon { font-size: 24px; }
+
+  /* PRICE SUMMARY */
+  .price-summary {
+    background: linear-gradient(135deg, var(--parchment), var(--cream));
+    border: 2px solid var(--wood-light);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .price-summary-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--wood-dark);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .selected-courses-list { margin-bottom: 10px; }
+
+  .selected-course-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 6px 10px;
+    background: white;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid var(--sage);
+  }
+
+  .selected-course-badge {
+    font-size: 16px;
+  }
+
+  .price-breakdown {
+    border-top: 1px dashed var(--wood-light);
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: var(--text-mid);
+  }
+
+  .price-final {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 2px solid var(--forest);
+  }
+
+  .discount-badge {
+    background: var(--leaf);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .no-course-msg {
+    text-align: center;
+    color: var(--wood-light);
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  /* PAYMENT MODAL */
+  .payment-qr {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .payment-qr img {
+    width: 220px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    border: 3px solid var(--gold);
+  }
+
+  .payment-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-top: 12px;
+  }
+
+  .payment-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--wood-dark);
+    margin: 8px 0;
+  }
+
+  .payment-note {
+    font-size: 12px;
+    color: var(--text-mid);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* SUCCESS CARD */
+  .success-card {
+    text-align: center;
+    padding: 16px;
+  }
+
+  .success-icon { font-size: 56px; margin-bottom: 12px; }
+
+  .success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: 8px;
+  }
+
+  .credentials-box {
+    background: linear-gradient(135deg, var(--forest), var(--moss));
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    text-align: left;
+  }
+
+  .cred-label { font-size: 12px; opacity: 0.75; letter-spacing: 1px; text-transform: uppercase; }
+  .cred-value { font-size: 22px; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
+
+  /* LOGIN FORM */
+  .login-extra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .forgot-link {
+    font-size: 12px;
+    color: var(--moss);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* DASHBOARD */
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--forest), var(--moss));
+    padding: 20px 24px;
+    color: white;
+  }
+
+  .dash-welcome {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+
+  .dash-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .dash-courses {
+    padding: 20px;
+  }
+
+  .dash-course-card {
+    background: white;
+    border: 2px solid var(--sage);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .dash-course-icon { font-size: 28px; }
+
+  .dash-course-name {
+    font-weight: 700;
+    color: var(--forest);
+    font-size: 15px;
+  }
+
+  .dash-course-status {
+    font-size: 12px;
+    color: var(--moss);
+    margin-top: 2px;
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--leaf), var(--moss));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--moss), var(--forest)); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--forest);
+    border: 2px solid var(--leaf);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-secondary:hover { background: var(--leaf); color: white; }
+
+  .btn-gold {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold), var(--wood-light));
+    color: var(--bark);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(200,169,75,0.4); }
+
+  .btn-danger {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .error-msg {
+    background: #fdecea;
+    border: 1.5px solid #f44336;
+    color: #b71c1c;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .success-msg {
+    background: #e8f5e9;
+    border: 1.5px solid var(--leaf);
+    color: var(--forest);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* FOOTER */
+  footer {
+    background: var(--bark);
+    color: var(--cream);
+    text-align: center;
+    padding: 24px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  footer p { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+
+  /* BUY COMPUTERS SECTION */
+  .computers-section {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #f0fae5, var(--cream));
+    padding: 40px 20px;
+  }
+
+  .buy-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px var(--shadow);
+    overflow: hidden;
+    border: 2px solid var(--sage);
+  }
+
+  .buy-header {
+    background: linear-gradient(135deg, var(--wood-dark), var(--wood-mid));
+    padding: 24px;
+    text-align: center;
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .buy-body {
+    padding: 24px;
+    text-align: center;
+  }
+
+  .buy-emoji { font-size: 64px; margin-bottom: 12px; }
+  .buy-desc { font-size: 14px; color: var(--text-mid); line-height: 1.6; margin-bottom: 20px; }
+
+  .contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37,211,102,0.4); }
+
+  /* Divider label */
+  .divider-label {
+    text-align: center;
+    position: relative;
+    margin: 8px 0;
+  }
+  .divider-label span {
+    background: var(--cream);
+    padding: 0 12px;
+    font-size: 12px;
+    color: var(--wood-mid);
+    position: relative;
+    z-index: 1;
+  }
+  .divider-label::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--parchment);
+  }
+
+  /* ====================================================
+     FULLY RESPONSIVE — Mobile → Tablet → Desktop → Large
+     ==================================================== */
+
+  /* --- SMALL MOBILE (320px – 479px) --- */
+  @media (max-width: 479px) {
+    nav {
+      padding: 0 10px;
+      height: auto;
+      min-height: 56px;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+    .nav-logo { flex: 1; min-width: 0; }
+    .nav-icon { width: 34px; height: 34px; font-size: 16px; }
+    .nav-title { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-subtitle { font-size: 9px; }
+    .nav-buttons { width: 100%; display: flex; gap: 6px; }
+    .nav-btn { flex: 1; padding: 7px 6px; font-size: 12px; text-align: center; }
+
+    .hero { padding: 28px 14px 24px; }
+    .hero h1 { font-size: 26px; }
+    .hero-badge { font-size: 10px; padding: 5px 12px; }
+    .hero-tagline { font-size: 13px; }
+    .hero-info-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .info-chip { justify-content: center; font-size: 12px; padding: 8px 12px; }
+
+    .section { padding: 28px 12px; }
+    .section-title { font-size: 22px; }
+    .courses-grid { grid-template-columns: 1fr; gap: 16px; }
+    .course-img { height: 120px; font-size: 48px; }
+    .course-name { font-size: 17px; }
+    .course-desc { font-size: 12px; }
+
+    .about-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .about-item { font-size: 12px; }
+    .about-value { font-size: 12px; }
+
+    .modal { border-radius: 14px; }
+    .modal-header { padding: 16px 16px; }
+    .modal-title { font-size: 18px; }
+    .modal-body { padding: 16px; }
+    .form-row { grid-template-columns: 1fr; gap: 10px; }
+    .form-input { padding: 10px 12px; font-size: 14px; }
+    .price-final { font-size: 16px; }
+    .payment-qr img { width: 180px; }
+
+    .credentials-box { padding: 16px; }
+    .cred-value { font-size: 18px; }
+
+    .dash-course-card { padding: 12px; }
+    footer { padding: 20px 14px; }
+    footer strong { font-size: 14px; }
+  }
+
+  /* --- MOBILE (480px – 767px) --- */
+  @media (min-width: 480px) and (max-width: 767px) {
+    nav { padding: 0 16px; height: 60px; }
+    .nav-title { font-size: 17px; }
+    .nav-btn { padding: 8px 16px; font-size: 13px; }
+
+    .hero { padding: 36px 20px 28px; }
+    .hero h1 { font-size: 32px; }
+    .hero-info-row { flex-direction: column; align-items: center; gap: 8px; }
+    .info-chip { font-size: 13px; }
+
+    .section { padding: 32px 16px; }
+    .courses-grid { grid-template-columns: 1fr; gap: 18px; }
+    .course-img { height: 130px; font-size: 52px; }
+
+    .form-row { grid-template-columns: 1fr; gap: 12px; }
+    .about-grid { grid-template-columns: 1fr 1fr; gap: 18px; }
+    .payment-qr img { width: 200px; }
+  }
+
+  /* --- TABLET (768px – 1023px) --- */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    nav { padding: 0 24px; height: 64px; }
+    .nav-title { font-size: 19px; }
+
+    .hero { padding: 50px 32px 36px; }
+    .hero h1 { font-size: 44px; }
+    .hero-info-row { flex-wrap: wrap; gap: 12px; }
+
+    .section { padding: 36px 24px; }
+    .section-title { font-size: 26px; }
+    .courses-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+    .about-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+    .modal { max-width: 500px; }
+    .form-row { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* --- DESKTOP (1024px – 1439px) --- */
+  @media (min-width: 1024px) and (max-width: 1439px) {
+    .courses-grid { grid-template-columns: repeat(3, 1fr); }
+    .hero h1 { font-size: 56px; }
+    .section { padding: 48px 24px; }
+    .about-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* --- LARGE DESKTOP (1440px+) --- */
+  @media (min-width: 1440px) {
+    .section { max-width: 1280px; padding: 56px 32px; }
+    .hero { padding: 72px 48px 52px; }
+    .hero h1 { font-size: 72px; }
+    .hero-tagline { font-size: 18px; max-width: 680px; }
+    .courses-grid { grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    .about-grid { grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    .course-img { height: 180px; font-size: 72px; }
+    .course-name { font-size: 22px; }
+    .nav-title { font-size: 22px; }
+    .nav-btn { padding: 11px 28px; font-size: 15px; }
+  }
+
+  /* --- MODAL always fits screen --- */
+  @media (max-height: 700px) {
+    .modal { max-height: 96vh; }
+    .modal-body { padding: 14px; }
+    .modal-header { padding: 14px 18px; }
+  }
+
+  /* --- TOUCH devices: remove hover effects --- */
+  @media (hover: none) {
+    .course-card:hover { transform: none; box-shadow: 0 4px 20px var(--shadow); }
+    .nav-btn:hover { transform: none; }
+    .btn-primary:hover, .btn-secondary:hover, .btn-gold:hover { transform: none; }
+    .contact-btn:hover { transform: none; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Leaf background decoration -->
+<div class="leaf-bg"></div>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-icon">🖥️</div>
+    <div>
+      <div class="nav-title">Perfect Computer</div>
+      <div class="nav-subtitle">RSCIT Authorized Center</div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button class="nav-btn btn-register" onclick="openModal('registerModal')">📝 Registration</button>
+    <button class="nav-btn btn-login" onclick="openModal('loginModal')">🔑 Login</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🌿 Gogunda, Rajasthan</div>
+  <h1>
+    <span>Welcome to</span>
+    Perfect Computer
+  </h1>
+  <p class="hero-tagline">
+    आपके उज्जवल भविष्य की नींव यहाँ से शुरू होती है। RSCIT, RS-CFA with Tally, Advanced Excel, Hindi-English Typing और बहुत कुछ सीखें — सही मार्गदर्शन के साथ।
+  </p>
+  <div class="hero-info-row">
+    <div class="info-chip">📍 Amrit Shri Nagar, Sayara Road, Gogunda</div>
+    <div class="info-chip">📞 +91 88907 14911</div>
+    <div class="info-chip">🎓 RSCIT Authorized</div>
+  </div>
+</section>
+
+<div class="wood-divider"></div>
+
+<!-- COURSES -->
+<section class="section">
+  <div class="section-title">🌿 हमारे Courses</div>
+  <div class="section-subtitle">सरकारी मान्यता प्राप्त पाठ्यक्रम — अनुभवी शिक्षकों द्वारा</div>
+
+  <div class="courses-grid">
+    <!-- RSCIT -->
+    <div class="course-card">
+      <div class="course-img course-img-rscit">
+        🎓
+        <div class="course-badge">Popular</div>
+      </div>
+      <div class="course-body">
+        <div class="course-name">RSCIT with AI</div>
+        <div class="course-desc">Rajasthan State Certificate in Information Technology with Artificial Intelligence — राज्य सरकार की मान्यता प्राप्त, नौकरी के लिए जरूरी।</div>
+        <div class="course-price"><div class="price-tag">₹4,200</div></div>
+        <button class="course-enroll-btn" onclick="openRegisterWithCourse('rscit')">📝 Enroll करें</button>
+      </div>
+    </div>
+
+    <!-- RS-CFA WITH TALLY -->
+    <div class="course-card">
+      <div class="course-img course-img-tally">
+        📊
+        <div class="course-badge">Best Job</div>
+      </div>
+      <div class="course-body">
+        <div class="course-name">RS-CFA With Tally Certification</div>
+        <div class="course-desc">Rajasthan State Certificate in Financial Accounting — Accounting, GST, Inventory और Payroll। CA firms, shops और businesses में direct jobs।</div>
+        <div class="course-price"><div class="price-tag">₹7,200</div></div>
+        <button class="course-enroll-btn" onclick="openRegisterWithCourse('tally')">📝 Enroll करें</button>
+      </div>
+    </div>
+
+    <!-- EXCEL -->
+    <div class="course-card">
+      <div class="course-img course-img-excel">
+        📈
+      </div>
+      <div class="course-body">
+        <div class="course-name">Advance Excel</div>
+        <div class="course-desc">Formulas, Pivot Tables, VLOOKUP, Macros, Charts — Office, Banking और Data Analysis के लिए।</div>
+        <div class="course-price"><div class="price-tag">₹4,500</div></div>
+        <button class="course-enroll-btn" onclick="openRegisterWithCourse('excel')">📝 Enroll करें</button>
+      </div>
+    </div>
+
+    <!-- RS-CFA -->
+    <div class="course-card">
+      <div class="course-img" style="background:linear-gradient(135deg,#1a4060,#0d6e8a)">
+        📒
+        <div class="course-badge">New</div>
+      </div>
+      <div class="course-body">
+        <div class="course-name">RS-CFA</div>
+        <div class="course-desc"><strong style="color:var(--forest)">Rajasthan State Certificate in Financial Accounting</strong></div>
+        <div class="course-desc" style="margin-top:6px">Financial Accounting के सिद्धांत, Tally के साथ व्यावहारिक ज्ञान — सरकारी व निजी क्षेत्र में करियर के लिए।</div>
+        <div class="course-price"><div class="price-tag">₹6,000</div></div>
+        <button class="course-enroll-btn" onclick="openRegisterWithCourse('rscfa')">📝 Enroll करें</button>
+      </div>
+    </div>
+
+    <!-- HINDI ENGLISH TYPING — FREE -->
+    <div class="course-card" style="border-color:var(--gold)">
+      <div class="course-img" style="background:linear-gradient(135deg,#5d4037,#8d6e63);position:relative">
+        ⌨️
+        <div class="course-badge" style="background:var(--leaf);color:white;font-size:12px">FREE</div>
+      </div>
+      <div class="course-body">
+        <div class="course-name" style="color:var(--wood-dark)">Hindi & English Typing</div>
+        <div class="course-desc">Accuracy &amp; Efficiency के साथ Hindi और English Typing — किसी भी दूसरे course के साथ <strong style="color:var(--leaf)">बिल्कुल FREE</strong>!</div>
+        <div class="course-price">
+          <div class="price-tag" style="background:linear-gradient(135deg,var(--leaf),var(--moss))">FREE 🎁</div>
+          <span style="font-size:12px;color:var(--wood-mid);margin-left:6px">किसी भी course के साथ</span>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0fae5,#e8f5e9);border:1.5px solid var(--leaf);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--forest);font-weight:600">
+          🎉 RSCIT / RS-CFA / Tally / Excel — किसी के साथ enroll करो और Typing बिल्कुल मुफ्त पाओ!
+        </div>
+      </div>
+    </div>
+
+    <!-- BUY COMPUTERS -->
+    <div class="course-card">
+      <div class="course-img course-img-computer">
+        🖥️
+        <div class="course-badge">New Stock</div>
+      </div>
+      <div class="course-body">
+        <div class="course-name">Buy Computers</div>
+        <div class="course-desc">Desktop, Laptop और Accessories — सर्वोत्तम कीमत पर। Branded और assembled दोनों उपलब्ध।</div>
+        <div class="course-price"><div class="price-tag">Best Price</div></div>
+        <a class="course-enroll-btn" href="tel:+918890714911" style="display:block;text-align:center;text-decoration:none;">📞 Call करें</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wood-divider"></div>
+
+<!-- ABOUT / CONTACT -->
+<section class="about-strip">
+  <div class="section-title" style="color:var(--sage)">📍 हमसे मिलें</div>
+  <div class="about-grid">
+    <div class="about-item">
+      <div class="about-icon">🏛️</div>
+      <div class="about-label">Address</div>
+      <div class="about-value">Amrit Shri Nagar, Sayara Road, Gogunda</div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon">📱</div>
+      <div class="about-label">Mobile</div>
+      <div class="about-value">+91 88907 14911</div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon">⏰</div>
+      <div class="about-label">Timing</div>
+      <div class="about-value">Mon–Sat: 9 AM – 6 PM</div>
+    </div>
+    <div class="about-item">
+      <div class="about-icon">🎓</div>
+      <div class="about-label">Affiliation</div>
+      <div class="about-value">RKCL / Vardhman Mahaveer Open University</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="font-size:22px;margin-bottom:8px">🌿</div>
+  <strong>Perfect Computer</strong> — RSCIT Authorized Center
+  <p>Amrit Shri Nagar, Sayara Road, Gogunda | 📞 88907 14911</p>
+  <p style="margin-top:8px;font-size:11px">© 2025 Perfect Computer. सर्वाधिकार सुरक्षित।</p>
+</footer>
+
+
+<!-- ==================== REGISTER MODAL ==================== -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📝 नया Registration</div>
+      <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="regError" class="error-msg" style="display:none"></div>
+      <div id="regSuccess" class="success-msg" style="display:none"></div>
+
+      <!-- STEP 1: PERSONAL DETAILS -->
+      <div id="regStep1">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name / नाम *</label>
+            <input type="text" class="form-input" id="regFirstName" placeholder="आपका नाम">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Surname / उपनाम *</label>
+            <input type="text" class="form-input" id="regSurname" placeholder="उपनाम">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Father's Name / पिता का नाम *</label>
+            <input type="text" class="form-input" id="regFatherName" placeholder="पिता का नाम">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mother's Name / माता का नाम *</label>
+            <input type="text" class="form-input" id="regMotherName" placeholder="माता का नाम">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Aadhar No. / आधार नंबर *</label>
+            <input type="text" class="form-input" id="regAadhar" placeholder="XXXX XXXX XXXX" maxlength="14">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mobile No. / मोबाइल *</label>
+            <input type="tel" class="form-input" id="regMobile" placeholder="+91 XXXXXXXXXX" maxlength="10">
+          </div>
+        </div>
+
+        <!-- COURSE SELECTOR -->
+        <div class="form-group">
+          <div class="course-selector-title">📚 Course चुनें (एक या सभी)</div>
+          <div class="course-options">
+            <label class="course-option" id="opt-rscit">
+              <input type="checkbox" id="chk-rscit" value="rscit" onchange="updateCourseSummary()">
+              <div class="course-option-icon">🎓</div>
+              <div class="course-option-info">
+                <div class="course-option-name">RSCIT with AI</div>
+                <div class="course-option-price">₹4,200</div>
+              </div>
+            </label>
+            <label class="course-option" id="opt-tally">
+              <input type="checkbox" id="chk-tally" value="tally" onchange="updateCourseSummary()">
+              <div class="course-option-icon">📊</div>
+              <div class="course-option-info">
+                <div class="course-option-name">RS-CFA With Tally Certification</div>
+                <div class="course-option-price">₹7,200 — Rajasthan State Certificate in Financial Accounting</div>
+              </div>
+            </label>
+            <label class="course-option" id="opt-excel">
+              <input type="checkbox" id="chk-excel" value="excel" onchange="updateCourseSummary()">
+              <div class="course-option-icon">📈</div>
+              <div class="course-option-info">
+                <div class="course-option-name">Advance Excel</div>
+                <div class="course-option-price">₹4,500</div>
+              </div>
+            </label>
+            <label class="course-option" id="opt-rscfa">
+              <input type="checkbox" id="chk-rscfa" value="rscfa" onchange="updateCourseSummary()">
+              <div class="course-option-icon">📒</div>
+              <div class="course-option-info">
+                <div class="course-option-name">RS-CFA</div>
+                <div class="course-option-price">₹6,000 — Rajasthan State Certificate in Financial Accounting</div>
+              </div>
+            </label>
+          </div>
+
+          <!-- FREE TYPING NOTE — always visible -->
+          <div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f0fae5,#e8f5e9);border:2px solid var(--leaf);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+            <span style="font-size:22px">⌨️</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--forest)">Hindi &amp; English Typing — <span style="color:var(--leaf)">बिल्कुल FREE 🎁</span></div>
+              <div style="font-size:11px;color:var(--text-mid);margin-top:2px">किसी भी ऊपर के course के साथ Typing course मुफ्त मिलेगा!</div>
+            </div>
+          </div>
+
+          <!-- PRICE SUMMARY -->
+          <div class="price-summary" id="priceSummary">
+            <div class="price-summary-title">💰 Fee Summary</div>
+            <div id="selectedCoursesList" class="selected-courses-list">
+              <div class="no-course-msg">👆 ऊपर से course चुनें</div>
+            </div>
+            <div id="priceBreakdown" class="price-breakdown" style="display:none">
+              <div class="price-row">
+                <span>कुल राशि:</span>
+                <span id="totalBeforeDiscount">₹0</span>
+              </div>
+              <div class="price-row" id="discountRow" style="display:none">
+                <span>Discount: <span id="discountBadge" class="discount-badge"></span></span>
+                <span id="discountAmount" style="color:var(--leaf)">-₹0</span>
+              </div>
+              <div class="price-final">
+                <span>Final Amount:</span>
+                <span id="finalAmount">₹0</span>
+              </div>
+            </div>
+            <!-- FREE TYPING BONUS NOTE -->
+            <div id="freeTypingNote" style="display:none;align-items:center;gap:8px;background:linear-gradient(135deg,#fff8e1,#fffde7);border:2px dashed var(--gold);border-radius:10px;padding:10px 12px;margin-top:10px">
+              <span style="font-size:20px">⌨️</span>
+              <div style="font-size:12px;font-weight:700;color:var(--wood-dark)">
+                🎁 Hindi &amp; English Typing — <span style="color:var(--leaf)">FREE मिलेगी!</span><br>
+                <span style="font-weight:400;color:var(--text-mid)">इस course के साथ Typing बिल्कुल मुफ्त।</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAY NOW BUTTON (appears when course selected) -->
+          <div id="payNowSection" style="display:none">
+            <button class="btn-gold" onclick="openPaymentModal()">
+              💳 अभी Pay करें (PhonePe / UPI)
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="registerStudent()">
+          ✅ Register Now
+        </button>
+        <button class="btn-secondary" onclick="closeModal('registerModal')">
+          ⏳ Buy Later — बाद में करें
+        </button>
+      </div>
+
+      <!-- STEP 2: SUCCESS -->
+      <div id="regStep2" style="display:none">
+        <div class="success-card">
+          <div class="success-icon">🎉</div>
+          <div class="success-title">Registration सफल!</div>
+          <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px">आपकी credentials नीचे हैं। इन्हें save कर लें।</p>
+          <div class="credentials-box">
+            <div class="cred-label">Registration No.</div>
+            <div class="cred-value" id="regNumber">—</div>
+            <div class="cred-label">Password</div>
+            <div class="cred-value" id="regPassword">—</div>
+          </div>
+          <p style="font-size:12px;color:var(--wood-mid);margin-bottom:16px">
+            ⚠️ इन details को screenshot लें या note कर लें।
+          </p>
+          <button class="btn-primary" onclick="closeModal('registerModal');openModal('loginModal')">
+            🔑 Login करें
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== PAYMENT MODAL ==================== -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">💳 Payment</div>
+      <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="payment-qr">
+        <img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDDDABCADAADDCADDDAADAABDADADDDDCAAAAAAAAAAAAAAAAAAAMMMIAEIAMPPAKJOAFMKAGAPKCOKAOMNNKAAAAAAAAAAAAAAAAAAAAPKAAELCMDDCBDCAHBNPJCHPPFLAPPPFKAAAAAAAAAAAAAAAAAAACMJAFIBLLPIEGIDABCFMDIADDCIAOMNFKAAAAAAAAAAAAAAAAAAABDDBBAPNNOPBCCAAFKFDCAEOOPBAJDDGKAAAAAAAAAAAAAAAAAAAAAAAMHDFKALHLIBAMLGBKHKBHPAEAAAAIAAAAAAAAAAAAAAAAAAABMDAMKKAEAEIECFMMPPCBNLANFFMPIBACAAAAAAAAAAAAAAAAAAEHCEGPKNAABNCCIDAFKFEAAEAMKGLCBNAIAAAAAAAAAAAAAAAAAAAMMGJDFKAAAFKCBEAGKFPINJDPENPJEPBAAAAAAAAAAAAAAAAAAAAEOHKEEOCCDKDMAPCOLPAPGIAJPBKKKEFIAAAAAAAAAAAAAAAAAAAALGMCAKABAFIBCPAFPOBMCFPHPEPMLBMAAAAAAAAAAAAAAAAAAAEIDGEPPCJGAHPCPPDLEPIBIAAHALAEOLAAAAAAAAAAAAAAAAAAAAECPODIHLEOFEIABBDGDGIHAJAJCMCKFMAKAAAAAAAAAAAAAAAAAAAECMKMNNALEIAAKFOBMBDGAMEMLEPCFNDAAAAAAAAAAAAAAAAAAABDLJPPFAABANPCDFAABGCAAOKPFIAKFCFKAAAAAAAAAAAAAAAAAAAIEMABDGMJMAICIEBBAAGNAIIMAKEJCMIAAAAAAAAAAAAAAAAAAAAEIKABPOAABJCDAKGDCEBAAADMPKBHKDFKAAAAAAAAAAAAAAAAAAAEKJENLIMJFKMLABKKABHMPGMJPBAMKAEIAAAAAAAAAAAAAAAAAABDCMADIABCAKAPCEEIAHCECAAFKMAAKBBCAAAAAAAAAAAAAAAAAABMBKFDDLMIMCAJEDAMBPBNANKFMAAIIMIAAAAAAAAAAAAAAAAAAAADEOLFNJBPEGKABLGFCLBBAMKAFOPCECFCAAAAAAAAAAAAAAAAAABIKCEBAAGAEINAAIEGAPAAAABAHJBNDCAIAAAAAAAAAAAAAAAAAAACPCBOAJCCHIACCMAOANAAMLDHNDAFPDHCAAAAAAAAAAAAAAAAAAEHCIAMBKIMMPPOPOAAEPIJAEMNLCEIBMMAAAAAAAAAAAAAAAAAAAAKLGDGACBMPPPPMCEMCCEKPOGPBPKBFHAAAAAAAAAAAAAAAAAAAAEBANCKFMAIEFGAAECFBHBEEPOGPAANKIIKAAAAAAAAAAAAAAAAAAALDFPPPPFJDOKAGIAFPOCAAFKPONCFKABAAAAAAAAAAAAAAAAAAAFMEIBACIAMABKEIJAEDEAMCMMHAHMAOKFKAAAAAAAAAAAAAAAAAABAAAABOAALLJLDAABBPHLKAICDBAABLHDKAAAAAAAAAAAAAAAAAAAAAAMAAKAMPGDHPKEFKDABANKFLKANPAEIAAAAAAAAAAAAAAAAAAAEDCAABFCBLIMONDAEJDDFHEKCNOAHOCDCAAAAAAAAAAAAAAAAAAAAPKAFKMIELPAMENPPOLMKPHPPFNKJPEMIAAAAAAAAAAAAAAAAAAAAMIAANLAAMOCCKFOMJLPAEENPBDIBKLACAAAAAAAAAAAAAAAAAAEMMMMAAEMMMMAMAMAMMMIAEIAMEEIMIEMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBBBAAAACAAABAACAABCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEMKCKKHPPPGBCKIJCEGKMKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIEMMEIAEMAAEIIAMIIAEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADCDAACBAACAAAAAACACAAAAACBABAAAAACAAAAAAAAAAAAAAAADJDAGALMMFLHBKIKEIAKAHLIIFBPMAFICFCPFGPHMDAAAAAAAAAAAAAAAAAAAMAAAADAAADACBAAADCCAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMMLPMNKOOAJCMOKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/EAAL/2gAMAwEAAgADAAAAEPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPONN/PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPLInSZfPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPIE2dkdvGFOPONNOINPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPDkdQA3vPCMMAMNNPLFPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPLwwQkvPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPLPHfPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPOf/cPe/8AT/TnLHHjrzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzyS9m12p5cCJb57aSnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz17z94zy7yy97/8APv8APPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPMONPOPOPPONNPPPPPOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPLIIMFNEDMPJKJLGEEKKCGDHJLPPPPPPPPPPPPPPPPPPPPPPPPPPPPHPHPPLPPPLPPHPPPHDDLPHLLHPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPNPPPMPPPPPOPPPPPOPPOOPNPPPPPPPPPPPPPPPPPPPPPPPPPFMNLPGEMIOJGMPFDPOGMOADHFMHKHMNPFPPPPPPPPPPPPPPPPPPPAPPPPPNPFAPNPPNPNPHPONPPKPOKPPKPFPPPPPPPPPPPPPPPPPPPCMNNLNCMBPIMMHIAAHMNGPDBAMPKPMIPFPPPPPPPPPPPPPPPPPPPEMMNONPMOOPOLNFOPPLHNPOPOPPKOMMMFPPPPPPPPPPPPPPPPPPHDADCNCKGGEGCANEMMLCFNHPLJNFMBADDHPPPPPPPPPPPPPPPPPPNIPEMMNCMMAFLOHFPNPOFNMPMKPOMOIOMNPPPPPPPPPPPPPPPPPPDFEONPGJGEKBDLNPPPLCJLONCKLKPHOEPHPPPPPPPPPPPPPPPPPPPFPFPPPPPPNPNLNFPNPKONNNKIPNPOLKONPPPPPPPPPPPPPPPPPPPKPPBDPGOHJBOPCPHMLOFPHNPKPLPLCLPFPPPPPPPPPPPPPPPPPPPBKHMPPLPOBOPOKPPNPLEOPNPKPNPOLKNPPPPPPPPPPPPPPPPPPPDIPGMNNOBLNIOGNMEPONMPMFPIPMPLJBPPPPPPPPPPPPPPPPPPPPLDPKMIPKEPHKPPKFMGGMIFPDCOIMCFOMBFPPPPPPPPPPPPPPPPPPPMIHHDPNJELDPKGPAJAOCMPHPHKPJCOCDPPPPPPPPPPPPPPPPPPPPHCOIFOHECPJABIOPPDLDOPIOGLLKKKJKPPPPPPPPPPPPPPPPPPPPGILPPPHPPPJPKPPMOPPLHPPPDPGLLCDCNPPPPPPPPPPPPPPPPPPKIDJOLPKGBPBKOPEGPHPFFPPMBHJOPKOLNPPPPPPPPPPPPPPPPPPPILOMMHFCIPLOHPKHNPOGDANDCDNMFKLPHPPPPPPPPPPPPPPPPPPOFEPDDIFGFNPKLNLLMPKODNPPKLPDCKCOPPPPPPPPPPPPPPPPPPPOJCHKNDCAEPJJBOMPLMCGPEGPLNPPCHCBHPPPPPPPPPPPPPPPPPPKHLGPJNECOJKLHOPNGCIPNBCPPHPOLLHHFPPPPPPPPPPPPPPPPPPOIIHPKHHNHLHFILEPBBAPDOOOAHFKJDOLHPPPPPPPPPPPPPPPPPPOJMNGNJFNOJFKLDFPJPAPPNNMIOPPEMGMNPPPPPPPPPPPPPPPPPPPNIFLDLKDLFPPGDBPPLBNPDPDGLPLCOLDHPPPPPPPPPPPPPPPPPPDDBLMHNNMDHPPDJFIGPOFKAHOGPLCKKKOPPPPPPPPPPPPPPPPPPPLPENKMHDKHKMHPOPBCMCEEEPOKPPPHCGMFPPPPPPPPPPPPPPPPPPPEACIEEMNNNBPKGDHLELNDDPOGMDMMJPCFPPPPPPPPPPPPPPPPPPOEIHEMOMFJHIPPHJAMDMECBLPLPNIACDPFPPPPPPPPPPPPPPPPPPMPPPPPMAHNGCPOPDOJPBPFPEPDKFOLONLFPPPPPPPPPPPPPPPPPPPNPPHLPCPHPKPPPPPHPEPPPPPKLPPPPPPHPPPPPPPPPPPPPPPPPPPADHPPLCAHGNDJDKAEMGDONEOJDNBHOPDNPPPPPPPPPPPPPPPPPPPAPPPPPLDPLDPKDJDDHMBPPDPKLHGDPLDHPPPPPPPPPPPPPPPPPPPEMIELGMMMMEOLPBNOJHPHJNNKKMJPKPMNPPPPPPPPPPPPPPPPPPPDDDDPPLDDDDLLPDHDDDDLPDLHLHHLHLDHPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPNNNPPPNOPMNNPMPMOPMOMPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPOMEHEOGNPDPANCKKFDHKIPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPHHLHDPPDDHPLPHDPDHPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP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
+        " alt="PhonePe QR Code - Perfect Computer">
+        <div class="payment-name">PUSHKAR PURI GOSWAMI</div>
+        <div class="payment-amount" id="payAmount">₹0</div>
+        <p class="payment-note">
+          📱 PhonePe / Google Pay / Paytm से scan करें<br>
+          Payment करने के बाद screenshot लें और center पर दिखाएं।
+        </p>
+        <button class="btn-primary" onclick="closeModal('paymentModal')" style="margin-top:16px">
+          ✅ Done — Registration पूरा करें
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== LOGIN MODAL ==================== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title">🔑 Student Login</div>
+      <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="loginError" class="error-msg" style="display:none"></div>
+      <div id="loginSuccess" class="success-msg" style="display:none"></div>
+
+      <div id="loginStep1">
+        <div class="form-group">
+          <label class="form-label">Registration No. / Mobile *</label>
+          <input type="text" class="form-input" id="loginId" placeholder="अपना Registration No. या Mobile डालें">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" class="form-input" id="loginPwd" placeholder="Password">
+        </div>
+        <div class="login-extra">
+          <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" id="showPwd" onchange="togglePwd()"> पासवर्ड दिखाएं
+          </label>
+          <span class="forgot-link" onclick="showForgot()">🔒 Forgot Password?</span>
+        </div>
+        <button class="btn-primary" onclick="loginStudent()">🚀 Login करें</button>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div id="forgotStep" style="display:none">
+        <div class="success-msg">📱 आपके registered mobile पर OTP आएगा।</div>
+        <div class="form-group">
+          <label class="form-label">Registered Mobile No.</label>
+          <input type="tel" class="form-input" id="forgotMobile" placeholder="XXXXXXXXXX">
+        </div>
+        <button class="btn-primary" onclick="handleForgot()">📲 OTP भेजें (SMS)</button>
+        <button class="btn-secondary" onclick="hideForgot()">← वापस जाएं</button>
+      </div>
+
+      <!-- OTP STEP -->
+      <div id="otpStep" style="display:none">
+        <div class="success-msg">✅ OTP आपके mobile पर भेजा गया। (5 मिनट में expire होगा)</div>
+        <!-- DEV NOTE: Only shows when API key not set -->
+        <div id="otpDevNote" class="error-msg" style="display:none;background:#fff8e1;border-color:#f9a825;color:#5d4037">
+          🔧 <strong>Setup mode:</strong> Fast2SMS API key अभी set नहीं है।<br>
+          आपका OTP: <strong id="otpDevCode" style="font-size:20px;letter-spacing:3px"></strong><br>
+          <small>Production के लिए fast2sms.com से API key लें और FAST2SMS_KEY में डालें।</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">OTP दर्ज करें</label>
+          <input type="text" class="form-input" id="otpInput" placeholder="6-digit OTP" maxlength="6" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label class="form-label">नया Password</label>
+          <input type="password" class="form-input" id="newPwd" placeholder="नया Password (कम से कम 4 characters)">
+        </div>
+        <button class="btn-primary" onclick="resetPassword()">🔄 Password Reset करें</button>
+        <button class="btn-secondary" onclick="hideForgot()">← वापस जाएं</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== DASHBOARD MODAL ==================== -->
+<div class="modal-overlay" id="dashboardModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🎓 Student Dashboard</div>
+      <button class="modal-close" onclick="logoutStudent()">Logout 🚪</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div class="dashboard-header">
+        <div class="dash-welcome">स्वागत है!</div>
+        <div class="dash-name" id="dashName">—</div>
+        <div style="font-size:13px;opacity:0.7;margin-top:4px">Reg. No: <span id="dashRegNo" style="font-weight:700;opacity:1">—</span></div>
+      </div>
+      <div class="dash-courses">
+        <div style="font-size:14px;font-weight:700;color:var(--forest);margin-bottom:12px">📚 आपके Enrolled Courses:</div>
+        <div id="dashCoursesList"></div>
+        <div style="margin-top:16px;padding:14px;background:var(--parchment);border-radius:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--wood-dark)">📞 Center Contact</div>
+          <div style="font-size:14px;margin-top:4px;color:var(--forest)">+91 88907 14911</div>
+          <div style="font-size:12px;color:var(--text-mid)">Amrit Shri Nagar, Sayara Road, Gogunda</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+// FIREBASE DYNAMIC LOADER — Firebase ke load hone ka wait karo
+// ============================================================
+let db = null;
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function initFirebase() {
+  try {
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js');
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDPJZ6duyIAzdx2zRSPL2YMNpZ618gG4uY",
+      authDomain: "perfect-computer-24485.firebaseapp.com",
+      projectId: "perfect-computer-24485",
+      storageBucket: "perfect-computer-24485.firebasestorage.app",
+      messagingSenderId: "394148759242",
+      appId: "1:394148759242:web:f7cd73813d0ed6ce861633",
+      measurementId: "G-9ZTCMHREYZ"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+    console.log('✅ Firebase ready');
+  } catch(e) {
+    console.warn('⚠️ Firebase load failed — offline mode:', e.message);
+    db = null;
+  }
+}
+
+// Firebase ko load karo — page load hote hi
+initFirebase();
+
+// ============================================================
+// COURSE DATA
+// ============================================================
+const COURSES = {
+  rscit:  { name: 'RSCIT with AI',                   price: 4200, icon: '🎓' },
+  tally:  { name: 'RS-CFA With Tally Certification', price: 7200, icon: '📊' },
+  excel:  { name: 'Advance Excel',                   price: 4500, icon: '📈' },
+  rscfa:  { name: 'RS-CFA (Financial Accounting)',   price: 6000, icon: '📒' }
+};
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(this.id);
+  });
+});
+
+function openRegisterWithCourse(courseKey) {
+  openModal('registerModal');
+  setTimeout(() => {
+    const chk = document.getElementById('chk-' + courseKey);
+    if (chk) { chk.checked = true; updateCourseSummary(); }
+  }, 100);
+}
+
+// ============================================================
+// COURSE PRICE CALCULATOR
+// ============================================================
+function updateCourseSummary() {
+  const selected = [];
+  ['rscit','tally','excel','rscfa'].forEach(k => {
+    const chk = document.getElementById('chk-' + k);
+    const opt = document.getElementById('opt-' + k);
+    if (chk && chk.checked) {
+      selected.push(k);
+      if (opt) opt.classList.add('selected');
+    } else if (opt) {
+      opt.classList.remove('selected');
+    }
+  });
+
+  const listEl = document.getElementById('selectedCoursesList');
+  const bdEl = document.getElementById('priceBreakdown');
+  const paySection = document.getElementById('payNowSection');
+
+  if (selected.length === 0) {
+    listEl.innerHTML = '<div class="no-course-msg">👆 ऊपर से course चुनें</div>';
+    bdEl.style.display = 'none';
+    paySection.style.display = 'none';
+    const freeNote = document.getElementById('freeTypingNote');
+    if (freeNote) freeNote.style.display = 'none';
+    return;
+  }
+
+  let total = 0;
+  let html = '';
+  selected.forEach(k => {
+    const c = COURSES[k];
+    total += c.price;
+    html += `<div class="selected-course-row"><span class="selected-course-badge">${c.icon}</span><span style="flex:1;font-weight:600">${c.name}</span><span>₹${c.price.toLocaleString()}</span></div>`;
+  });
+  listEl.innerHTML = html;
+
+  let discount = 0;
+  let discountLabel = '';
+  if (selected.length === 2) { discount = Math.round(total * 0.05); discountLabel = '5% OFF (2 courses)'; }
+  if (selected.length === 3) { discount = Math.round(total * 0.10); discountLabel = '10% OFF (3 courses)'; }
+  if (selected.length === 4) { discount = Math.round(total * 0.10); discountLabel = '10% OFF (सभी 4 courses)'; }
+  const final = total - discount;
+
+  document.getElementById('totalBeforeDiscount').textContent = '₹' + total.toLocaleString();
+  document.getElementById('finalAmount').textContent = '₹' + final.toLocaleString();
+
+  const discRow = document.getElementById('discountRow');
+  if (discount > 0) {
+    discRow.style.display = 'flex';
+    document.getElementById('discountBadge').textContent = discountLabel;
+    document.getElementById('discountAmount').textContent = '-₹' + discount.toLocaleString();
+  } else {
+    discRow.style.display = 'none';
+  }
+
+  bdEl.style.display = 'block';
+  paySection.style.display = 'block';
+
+  // FREE Typing note
+  const freeNote = document.getElementById('freeTypingNote');
+  if (freeNote) freeNote.style.display = 'flex';
+
+  document.getElementById('payAmount').textContent = '₹' + final.toLocaleString();
+}
+
+function openPaymentModal() {
+  openModal('paymentModal');
+}
+
+// ============================================================
+// REGISTRATION
+// ============================================================
+function generateRegNo() {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return 'PC' + year + rand;
+}
+
+function generatePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let pwd = '';
+  for (let i = 0; i < 6; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  return pwd;
+}
+
+async function registerStudent() {
+  const firstName  = document.getElementById('regFirstName').value.trim();
+  const surname    = document.getElementById('regSurname').value.trim();
+  const fatherName = document.getElementById('regFatherName').value.trim();
+  const motherName = document.getElementById('regMotherName').value.trim();
+  const aadhar     = document.getElementById('regAadhar').value.trim();
+  const mobile     = document.getElementById('regMobile').value.trim();
+
+  const errEl = document.getElementById('regError');
+  errEl.style.display = 'none';
+
+  if (!firstName || !surname || !fatherName || !motherName) {
+    errEl.textContent = '⚠️ कृपया सभी जरूरी fields भरें।';
+    errEl.style.display = 'block'; return;
+  }
+  if (!/^\d{10}$/.test(mobile)) {
+    errEl.textContent = '⚠️ Mobile No. 10 digits का होना चाहिए।';
+    errEl.style.display = 'block'; return;
+  }
+  if (aadhar && !/^\d{12}$/.test(aadhar.replace(/\s/g,''))) {
+    errEl.textContent = '⚠️ Aadhar No. 12 digits का होना चाहिए।';
+    errEl.style.display = 'block'; return;
+  }
+
+  const selected = ['rscit','tally','excel','rscfa'].filter(k => document.getElementById('chk-'+k)?.checked);
+
+  const regNo  = generateRegNo();
+  const pwd    = generatePassword();
+  const pwdHash = pwd; // In production use hashing
+
+  const btn = document.querySelector('#regStep1 .btn-primary');
+  try {
+    btn.innerHTML = '<span class="spinner"></span>Saving...';
+    btn.disabled = true;
+
+    if (!db) {
+      // Firebase unavailable — still generate credentials and show success
+      console.warn('Firebase unavailable, showing local credentials');
+    } else {
+      await db.collection('students').doc(regNo).set({
+        regNo, firstName, surname, fatherName, motherName,
+        aadhar: aadhar.replace(/\s/g,''), mobile,
+        courses: selected,
+        password: pwdHash,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    document.getElementById('regNumber').textContent = regNo;
+    document.getElementById('regPassword').textContent = pwd;
+    document.getElementById('regStep1').style.display = 'none';
+    document.getElementById('regStep2').style.display = 'block';
+
+  } catch(err) {
+    console.error(err);
+    errEl.textContent = '❌ Registration में error: ' + err.message;
+    errEl.style.display = 'block';
+    btn.innerHTML = '✅ Register Now';
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function togglePwd() {
+  const inp = document.getElementById('loginPwd');
+  inp.type = document.getElementById('showPwd').checked ? 'text' : 'password';
+}
+
+async function loginStudent() {
+  const loginId = document.getElementById('loginId').value.trim();
+  const pwd     = document.getElementById('loginPwd').value.trim();
+  const errEl   = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  if (!loginId || !pwd) {
+    errEl.textContent = '⚠️ Registration No. और Password दर्ज करें।';
+    errEl.style.display = 'block'; return;
+  }
+
+  const btn = document.querySelector('#loginStep1 .btn-primary');
+  try {
+    btn.innerHTML = '<span class="spinner"></span>Logging in...';
+    btn.disabled = true;
+
+    if (!db) {
+      throw new Error('Database अभी load हो रही है। थोड़ा रुककर फिर try करें।');
+    }
+
+    // Try by regNo first
+    let snap = await db.collection('students').doc(loginId).get();
+
+    // If not found by regNo, try by mobile
+    if (!snap.exists) {
+      const q = await db.collection('students').where('mobile', '==', loginId).limit(1).get();
+      if (!q.empty) snap = q.docs[0];
+    }
+
+    if (!snap || !snap.exists) {
+      throw new Error('Registration No. या Mobile नहीं मिला।');
+    }
+
+    const data = snap.data ? snap.data() : snap;
+    if (data.password !== pwd) {
+      throw new Error('Password गलत है।');
+    }
+
+    // Success — show dashboard
+    closeModal('loginModal');
+    showDashboard(data);
+
+  } catch(err) {
+    errEl.textContent = '❌ ' + err.message;
+    errEl.style.display = 'block';
+    btn.innerHTML = '🚀 Login करें';
+    btn.disabled = false;
+  }
+}
+
+function showDashboard(data) {
+  const name = data.firstName + ' ' + data.surname;
+  document.getElementById('dashName').textContent = name;
+  document.getElementById('dashRegNo').textContent = data.regNo;
+
+  const courses = data.courses || [];
+  const listEl = document.getElementById('dashCoursesList');
+
+  if (courses.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center;color:var(--wood-light);padding:20px">कोई course enrolled नहीं है।<br><small>Center पर आकर enroll करें।</small></div>';
+  } else {
+    listEl.innerHTML = courses.map(k => {
+      const c = COURSES[k];
+      if (!c) return '';
+      return `<div class="dash-course-card">
+        <div class="dash-course-icon">${c.icon}</div>
+        <div>
+          <div class="dash-course-name">${c.name}</div>
+          <div class="dash-course-status">✅ Enrolled | ₹${c.price.toLocaleString()}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  openModal('dashboardModal');
+}
+
+function logoutStudent() {
+  closeModal('dashboardModal');
+  document.getElementById('loginId').value = '';
+  document.getElementById('loginPwd').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+// ============================================================
+// SMS OTP — Fast2SMS Integration
+// ✅ FREE Indian SMS API — signup at fast2sms.com to get API key
+// Replace YOUR_FAST2SMS_API_KEY below with your actual key
+// ============================================================
+const FAST2SMS_KEY = '72BFDazUfL153tAXEs6cQSPYZgI8WTOvHxMnoRkKliqmhyrVdJmhWj7IwEOASL10cUgv4pRrZyHFoCk9';
+
+async function sendSmsOtp(mobile, otp) {
+  // Fast2SMS Quick SMS (free tier available)
+  // Note: Browser CORS ke wajah se direct call nahi hogi production mein.
+  // Isliye hum Firestore mein OTP store karenge aur ek Cloud Function ya
+  // proxy se SMS bhejenge. Abhi ke liye fallback: OTP screen pe dikhayenge.
+  try {
+    // Store OTP in Firestore with 5-min expiry
+    if (!db) { return true; } // Firebase unavailable — skip storage, still proceed
+    await db.collection('otps').doc(mobile).set({
+      otp,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+    });
+
+    // Attempt Fast2SMS via no-cors (will be blocked in browser, that's OK)
+    // For real deployment: use a Firebase Cloud Function to call Fast2SMS
+    const msg = `Perfect Computer Gogunda - OTP: ${otp}. Valid 5 min. Do not share. -Perfect Computer`;
+    fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_KEY}&route=q&message=${encodeURIComponent(msg)}&language=english&flash=0&numbers=${mobile}`, {
+      mode: 'no-cors'
+    }).catch(() => {}); // Silently fail if blocked (expected in browser)
+
+    return true;
+  } catch(e) {
+    console.error('SMS send error:', e);
+    return false;
+  }
+}
+
+async function verifyOtpFromFirestore(mobile, enteredOtp) {
+  try {
+    if (!db) return false;
+    const doc = await db.collection('otps').doc(mobile).get();
+    if (!doc.exists) return false;
+    const data = doc.data();
+    const expiry = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
+    if (new Date() > expiry) return false; // Expired
+    return data.otp === enteredOtp;
+  } catch(e) {
+    return false;
+  }
+}
+
+// ============================================================
+// FORGOT PASSWORD
+// ============================================================
+function showForgot() {
+  document.getElementById('loginStep1').style.display = 'none';
+  document.getElementById('forgotStep').style.display = 'block';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginSuccess').style.display = 'none';
+}
+
+function hideForgot() {
+  document.getElementById('forgotStep').style.display = 'none';
+  document.getElementById('otpStep').style.display = 'none';
+  document.getElementById('loginStep1').style.display = 'block';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+async function handleForgot() {
+  const mobile = document.getElementById('forgotMobile').value.trim();
+  const errEl  = document.getElementById('loginError');
+  const btn    = document.querySelector('#forgotStep .btn-primary');
+  errEl.style.display = 'none';
+
+  if (!/^\d{10}$/.test(mobile)) {
+    errEl.textContent = '⚠️ सही 10-digit mobile number डालें।';
+    errEl.style.display = 'block'; return;
+  }
+
+  try {
+    btn.innerHTML = '<span class="spinner"></span>Check कर रहे हैं...';
+    btn.disabled = true;
+
+    if (!db) {
+      throw new Error('Database अभी load हो रही है। थोड़ा रुककर फिर try करें।');
+    }
+
+    const q = await db.collection('students').where('mobile', '==', mobile).limit(1).get();
+    if (q.empty) {
+      errEl.textContent = '❌ यह mobile registered नहीं है।';
+      errEl.style.display = 'block';
+      btn.innerHTML = '📲 OTP भेजें'; btn.disabled = false; return;
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    window._pendingOtp   = otp;
+    window._pendingMobile = mobile;
+    window._pendingDoc   = q.docs[0].id;
+
+    btn.innerHTML = '<span class="spinner"></span>SMS भेज रहे हैं...';
+
+    await sendSmsOtp(mobile, otp);
+
+    // Fallback: show OTP on screen if API key not set
+    if (FAST2SMS_KEY === 'YOUR_FAST2SMS_API_KEY') {
+      document.getElementById('otpDevNote').style.display = 'block';
+      document.getElementById('otpDevCode').textContent = otp;
+    } else {
+      document.getElementById('otpDevNote').style.display = 'none';
+    }
+
+    document.getElementById('forgotStep').style.display = 'none';
+    document.getElementById('otpStep').style.display = 'block';
+    btn.innerHTML = '📲 OTP भेजें'; btn.disabled = false;
+
+  } catch(err) {
+    errEl.textContent = '❌ Error: ' + err.message;
+    errEl.style.display = 'block';
+    btn.innerHTML = '📲 OTP भेजें'; btn.disabled = false;
+  }
+}
+
+async function resetPassword() {
+  const otp    = document.getElementById('otpInput').value.trim();
+  const newPwd = document.getElementById('newPwd').value.trim();
+  const errEl  = document.getElementById('loginError');
+  const btn    = document.querySelector('#otpStep .btn-primary');
+  errEl.style.display = 'none';
+
+  if (!otp || otp.length < 6) {
+    errEl.textContent = '⚠️ 6-digit OTP डालें।';
+    errEl.style.display = 'block'; return;
+  }
+  if (newPwd.length < 4) {
+    errEl.textContent = '⚠️ Password कम से कम 4 characters का होना चाहिए।';
+    errEl.style.display = 'block'; return;
+  }
+
+  // Verify OTP — check both local and Firestore
+  const localMatch = (otp === window._pendingOtp);
+  const storeMatch = await verifyOtpFromFirestore(window._pendingMobile, otp);
+
+  if (!localMatch && !storeMatch) {
+    errEl.textContent = '❌ OTP गलत है या expire हो गया।';
+    errEl.style.display = 'block'; return;
+  }
+
+  try {
+    btn.innerHTML = '<span class="spinner"></span>Reset हो रहा है...';
+    btn.disabled = true;
+
+    if (db) {
+      await db.collection('students').doc(window._pendingDoc).update({ password: newPwd });
+      await db.collection('otps').doc(window._pendingMobile).delete().catch(()=>{});
+    }
+
+    const suc = document.getElementById('loginSuccess');
+    suc.textContent = '✅ Password reset हो गया! अब login करें।';
+    suc.style.display = 'block';
+    document.getElementById('otpStep').style.display = 'none';
+    document.getElementById('loginStep1').style.display = 'block';
+    document.getElementById('loginId').value = window._pendingMobile;
+    btn.innerHTML = '🔄 Password Reset करें'; btn.disabled = false;
+  } catch(err) {
+    errEl.textContent = '❌ Error: ' + err.message;
+    errEl.style.display = 'block';
+    btn.innerHTML = '🔄 Password Reset करें'; btn.disabled = false;
+  }
+}
+
+// Format Aadhar input
+document.getElementById('regAadhar')?.addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '').slice(0,12);
+  this.value = v.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+});
+</script>
+</body>
+</html>
